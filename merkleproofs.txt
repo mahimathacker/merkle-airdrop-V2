@@ -1,0 +1,86 @@
+Instead of using for loop to iterate over the list of addresses, we can use a Merkle proofs
+       Merkle proofs : allows us to prove that a given address is in the list of addresses
+       merkle proofs comes from a merkle tree
+       merkle tree is a binary tree that is used to store a list of addresses
+    The leafs -> Hash of the addresses
+    The root -> Root hash of the merkle tree
+
+
+    So example:-
+
+    Combine all the leaf hashes to get the root hash
+    
+
+    Merkle Tree
+
+A data structure that compresses a large dataset into one hash called the Merkle root
+
+Each data item is hashed, paired, and re-hashed until a single root is produced
+
+The root represents the entire dataset without storing all data on-chain
+
+Merkle Proof: 
+
+A small set of hashes used to prove a specific data item exists in the Merkle Tree
+
+Allows verification without revealing the full dataset
+
+Used by smart contracts to validate membership or eligibility
+
+Why Merkle Trees are used in Web3: 
+
+On-chain storage is expensive
+
+Merkle Trees allow storing only one hash instead of thousands of values
+
+Verification is done using proofs supplied by users
+
+Common Web3 use cases: 
+
+Token airdrops to verify eligible addresses
+
+NFT whitelist minting without storing all addresses on-chain
+
+DAO governance voting using snapshot-based balances
+
+Reward or refund eligibility checks
+
+Why Merkle Trees are better than regular Solidity data types
+
+Store one Merkle root instead of large mappings or arrays
+
+Significant gas savings
+
+Easy to update datasets off-chain without redeploying contracts
+
+When to use Merkle Trees instead of mappings or arrays
+
+Dataset is large
+
+Data is mostly static
+
+Verification is needed, not frequent updates
+
+One-time or limited interactions such as claims or mints
+
+When not to use Merkle Trees
+
+Data changes frequently
+
+Requires on-chain modifications
+
+Needs random access or continuous updates
+
+Dataset is small and gas is not a concern
+
+Simple mental model
+
+Merkle Tree is for proving membership, not storing data
+
+If the contract needs
+//Kekkach256 to do it
+merkle proofs are used in rollups to prove state changes and verify the order of transactions
+
+
+
+-> Ethereum Signatures: EIP-191 & EIP-712 : to verify the signatures
