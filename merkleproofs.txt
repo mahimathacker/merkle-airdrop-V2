@@ -84,3 +84,162 @@ merkle proofs are used in rollups to prove state changes and verify the order of
 
 
 -> Ethereum Signatures: EIP-191 & EIP-712 : to verify the signatures
+
+Modern wallet prompts, leveraging EIP-712, now display structured, human-readable data. For example, signing an "Ether Mail" message might clearly show domain information and mail details with fields like "from Person," "to Person," and "contents," allowing users to confidently verify what they are authorizing.
+
+EIP-191 was introduced to standardize the format for data that is signed off-chain and intended for verification, often within smart contracts. Its primary goal is to ensure that signed data cannot be misinterpreted as a regular Ethereum transaction, thereby preventing a class of replay attacks.
+
+The EIP-191 specification defines the following format for data to be signed:
+0x19 <1 byte version> <version specific data> <data to sign>
+
+
+EIP-712: Typed Structured Data Hashing and Signing:
+
+The EIP-712 signing format, under EIP-191 version 0x01, is:
+0x19 0x01 <domainSeparator> <hashStruct(message)>
+
+The domainSeparator is calculated as hashStruct(eip712Domain). The eip712Domain is a struct typically defined as:
+
+The final bytes32 digest that is actually passed to ecrecover (or a safer alternative) for EIP-712 compliant signatures is:
+digest = keccak256(abi.encodePacked(bytes1(0x19), bytes1(0x01), domainSeparator, hashStruct(message)))
+
+EIP 191 - standardize what the data should look like 
+EIP-712 - Creates the format of the version specific data and the data to sign
+
+
+ECDSA Singature is cryptographic algorithm used for -> 
+- Generate Key pairs
+- Create Signatures
+- Verify Signatures
+-> The specific curve used in Ethereum from ECDSA is Secp256k1 curve
+The v,r,s are the points of X axis on the curve
+
+G -> constant point 
+prime number generated from G is -> n
+
+(V,r,s) -> r: X axis on the Secp256k1 curve 
+s: proofs that signer knows the private key 
+v: recover public key from the R and here it shows if its in the Y negative or the postive state position knows Polarity
+
+private keys generated -> 0 to n-1
+
+public key = private key * G (moduar multiplacation)
+
+
+Do not use ECrecover directly as it can lead to security issues, and also if signature is invalid the ecrecover will return the 0 address
+, hence use openzeppelin's provided contract to , check exists in openzeppelin library if using it and it will revert when address(0)
+
+
+
+Transaction type: 
+
+Type: 0 -> Legancy transactions (when defined --legacy)
+Type: 1 -> Operational Access risks from (EIP-2930) -> Address contract breadkage risks from EIP - 2929(Contains Addtional AccessList parameter include Type 0 params)
+Type: 2 ->  EIP- 1559 introduced during London Fork, tackled congestion and high network gas fees, base fees, max priority fees etc
+Type 3: Blob transaction(EIP - 4844) : Introuced in Dencun fork, scalling solutions for rollups, Addtional fees: max_blob_fee_per_gas etc
+
+
+ZkSync 2 transactions:- 
+
+1) 0x71: Typed Structured data (EIP-712)
+
+EIP712 -> standardize the message data structure, access ZkSync features. i.e Account Abstraction
+In addition to standard Ethereum transaction fields, Type 113 transactions on zkSync include several custom fields:
+
+gasPerPubData: The maximum gas the sender is willing to pay for each byte of "pubdata." Pubdata refers to L2 state data that needs to be published to L1 for data availability.
+
+customSignature: This field is used when the transaction signer is not a standard Externally Owned Account (EOA), such as a smart contract wallet leveraging account abstraction. It allows for custom signature validation logic.
+
+paymasterParams: Parameters for configuring a custom Paymaster smart contract, detailing how it will cover the transaction fees.
+
+factory_deps: An array of bytecodes for contracts that the deployed contract might, in turn, deploy. This is crucial for deploying contracts that have dependencies on other contracts or create new contract instances.
+
+Type 255 (Priority Transactions / 0xff): priority transactions. L1 -> L2 transactions
+
+
+EIP 4844 -> Blob transactions : Binary large object 
+Normally before this upgrade all the transactions were getting compressed and stored for verification on Ethereum so that was stored permenately hence We have now Blobs transactions
+where once transactions done then dump it so no storage required for verification purpose on L1 from L2s 
+
+Calldata fees larger -> Blobs data fees way more cheaper
+Opcodes for BLOB hashed versions: BLOBHASH and HASH_OPCODE_BYTE and POINT_EVAlUTION...
+
+
+Layer 2 rollups (such as ZK Sync, Arbitrum, and Optimism) have emerged as the primary scaling solution for Ethereum. They work by:
+
+Executing transactions off-chain (on the L2).
+
+Batching many transactions together.
+
+Compressing this batch.
+
+Posting the compressed batch data back to the L1 mainnet for security and data availability.
+
+
+What Danksharding is (in simple words)
+
+Danksharding is Ethereum’s plan to make posting data on Ethereum very cheap, so rollups can scale and users pay less gas.
+
+It is not about running smart contracts faster.
+It is mainly about handling data better.
+
+What EIP-4844 does
+
+EIP-4844 is the first small step toward Danksharding.
+
+Instead of storing rollup data in normal Ethereum transaction data (which is costly and permanent), it introduces a new cheap data space.
+
+Think of it as:
+
+Old way: store data in expensive permanent storage
+
+New way: store data in a temporary, cheaper data area
+
+What are blobs (very simply)
+
+Blobs are big chunks of data that:
+
+Are cheap to include in Ethereum blocks
+
+Are kept only for some time, then deleted
+
+Are only used so others can verify rollup data
+
+Smart contracts cannot read blobs.
+Ethereum just makes sure the data exists and is available.
+
+Why this helps you as a user
+
+Because rollups can:
+
+Publish their data much cheaper
+
+Handle more transactions
+
+Charge lower fees
+
+So:
+
+Lower gas fees
+
+Faster rollups
+
+Better scaling without changing how smart contracts work
+
+Why it’s called Proto-Danksharding
+
+“Proto” means early version.
+
+EIP-4844 is:
+
+Not full Danksharding
+
+But built on the same idea
+
+Safe to ship now
+
+Full Danksharding will later increase this cheap data capacity a lot more.
+-> Danksharding makes Ethereum good at data, so rollups can make Ethereum fast and cheap.
+
+//To get the sign message:  cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getMessage(address, uint256)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 25000000000000000000 --rpc-url http://localhost:8545
+//mahimathacker@Mahimas-MacBook-Air merkle_tree_airdrop % cast wallet sign --no-hash 0x184e30c4b19f5e304a89352421dc50346dad61c461e79155b910e73fd856dc72 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
